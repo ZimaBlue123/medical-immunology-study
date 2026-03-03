@@ -8,7 +8,7 @@
 - 新增核心概念约30个
 - 新增临床疾病约10个
 - 补充免疫调节、疫苗、CAR-T等最新内容
-- 详细内容见 `knowledge-expansion-log.md`
+- 详细内容见 `docs/knowledge-expansion-log.md`
 
 > 说明：本文件是“单一真相来源（SSOT）”。不要另起多个 tracker 文件。
 

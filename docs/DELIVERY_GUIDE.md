@@ -391,7 +391,7 @@ Web界面 → 练习 → 选择模块 → 开始答题
 
 1. 查看 `README.md` 了解基本使用
 2. 查看 `FEATURES.md` 了解功能清单
-3. 查看 `ANDROID_README.md` 了解Android版本
+3. 查看 `android/ANDROID_README.md` 了解Android版本
 4. 查看代码注释了解实现细节
 
 ---

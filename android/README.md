@@ -80,8 +80,8 @@ android/app/build/outputs/apk/debug/app-debug.apk
 ## 📄 详细说明
 
 - `BUILD_GUIDE.md` - 完整构建指南
-- `../ANDROID_QUICK_START.md` - 快速开始指南
-- `../ANDROID_README.md` - Android版本说明
+- `../docs/android/ANDROID_QUICK_START.md` - 快速开始指南
+- `../docs/android/ANDROID_README.md` - Android版本说明
 
 ---
 

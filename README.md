@@ -37,6 +37,18 @@ python .\run_cli.py quiz --deck .\decks\people9-core.json --n 10
 
 ---
 
+## 文档导航
+
+- **完整使用指南（Web/CLI/数据存储说明）**：`docs/USER_GUIDE.md`
+- **功能清单**：`docs/FEATURES.md`
+- **知识库扩展记录**：`docs/knowledge-expansion-log.md`
+- **Android 版本**：
+  - 快速开始：`docs/android/ANDROID_QUICK_START.md`
+  - 版本说明：`docs/android/ANDROID_README.md`
+  - Android 工程入口：`android/README.md`
+
+---
+
 ## 目录结构
 
 ```
