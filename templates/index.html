@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医学免疫学学习系统</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Navigation */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .nav-btn .icon {
+            font-size: 1.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .section {
+            display: none;
+            padding: 24px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ==================== 学习教练 ==================== */
+        .coach-section {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 280px);
+            min-height: 500px;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .chat-message.coach .chat-avatar {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        }
+
+        .chat-message.user .chat-avatar {
+            background: var(--success);
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            line-height: 1.6;
+        }
+
+        .chat-message.coach .chat-bubble {
+            background: white;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .quick-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .topic-chip {
+            padding: 8px 14px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .topic-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Knowledge Concept Card */
+        .concept-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .concept-term {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .concept-definition {
+            margin-bottom: 12px;
+        }
+
+        .concept-points {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .concept-point {
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .concept-tip {
+            font-size: 0.9rem;
+            color: var(--warning);
+            font-style: italic;
+        }
+
+        /* ==================== 知识卡片 ==================== */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .module-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .module-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .module-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .module-objectives {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .module-detail {
+            display: none;
+        }
+
+        .module-detail.active {
+            display: block;
+        }
+
+        /* 知识卡片搜索和筛选 */
+        .knowledge-header {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .filter-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-box label {
+            font-weight: 500;
+        }
+
+        .filter-box select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .concept-card-clickable {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .concept-card-clickable:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .concept-module-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: var(--radius);
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: var(--text);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        .knowledge-section {
+            margin-bottom: 24px;
+        }
+
+        .knowledge-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .confusion-card {
+            background: #fef3c7;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .confusion-pair {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 6px;
+        }
+
+        .confusion-diff {
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .confusion-trap {
+            font-size: 0.85rem;
+            color: var(--danger);
+        }
+
+        .clinical-link {
+            padding: 10px 14px;
+            background: #ecfdf5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #065f46;
+        }
+
+        /* ==================== 练习模式 ==================== */
+        .quiz-settings {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-settings label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .quiz-settings input[type="number"],
+        .quiz-settings select {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Question */
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question-progress {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .question-tags {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 12px;
+        }
+
+        .question-stem {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .choice:hover {
+            border-color: var(--primary);
+            background: #f8faff;
+        }
+
+        .choice.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .choice.correct {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+
+        .choice.wrong {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .choice-letter {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--bg);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .choice.selected .choice-letter {
+            background: var(--primary);
+            color: white;
+        }
+
+        .choice.correct .choice-letter {
+            background: var(--success);
+            color: white;
+        }
+
+        .choice.wrong .choice-letter {
+            background: var(--danger);
+            color: white;
+        }
+
+        .choice-text {
+            flex: 1;
+            padding-top: 4px;
+        }
+
+        .short-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .short-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Result */
+        .result-card {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .result-card.correct {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #a7f3d0;
+        }
+
+        .result-card.wrong {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid #fecaca;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .result-icon {
+            font-size: 1.5rem;
+        }
+
+        .result-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .result-card.correct .result-title {
+            color: #065f46;
+        }
+
+        .result-card.wrong .result-title {
+            color: #991b1b;
+        }
+
+        .result-answer {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .result-explain {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Learning Guide */
+        .learning-guide {
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .learning-guide h4 {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        /* Summary */
+        .summary-card {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .summary-score {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .summary-score.high { color: var(--success); }
+        .summary-score.mid { color: var(--warning); }
+        .summary-score.low { color: var(--danger); }
+
+        .summary-text {
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+
+        /* ==================== 学习进度 ==================== */
+        .progress-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .progress-stat {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .module-progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .module-progress-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .module-progress-info {
+            flex: 1;
+        }
+
+        .module-progress-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .module-progress-percent {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* ==================== 错题本 ==================== */
+        .wrong-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .wrong-item {
+            padding: 10px 16px;
+            background: #fef2f2;
+            color: #991b1b;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5rem; }
+            .nav-grid { grid-template-columns: repeat(5, 1fr); }
+            .nav-btn { padding: 10px 4px; font-size: 0.7rem; }
+            .nav-btn .icon { font-size: 1.2rem; }
+            .progress-overview { grid-template-columns: 1fr; }
+            .module-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>医学免疫学学习系统</h1>
+            <p>Guided Learning | 引导式学习</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-grid">
+            <button class="nav-btn active" data-tab="coach">
+                <span class="icon">💬</span>
+                <span>学习教练</span>
+            </button>
+            <button class="nav-btn" data-tab="knowledge">
+                <span class="icon">📚</span>
+                <span>知识卡片</span>
+            </button>
+            <button class="nav-btn" data-tab="quiz">
+                <span class="icon">✏️</span>
+                <span>练习</span>
+            </button>
+            <button class="nav-btn" data-tab="progress">
+                <span class="icon">📊</span>
+                <span>进度</span>
+            </button>
+            <button class="nav-btn" data-tab="wrong">
+                <span class="icon">📕</span>
+                <span>错题本</span>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- 学习教练 -->
+            <div id="coach" class="section active">
+                <div class="coach-section">
+                    <div class="chat-container" id="chat-container">
+                        <div class="chat-message coach">
+                            <div class="chat-avatar">🎓</div>
+                            <div class="chat-bubble">
+                                <p>你好！我是你的医学免疫学学习教练。</p>
+                                <p style="margin-top:8px;">你想学习哪个主题？可以直接输入，或点击下方快捷按钮：</p>
+                                <div class="quick-topics">
+                                    <span class="topic-chip" onclick="exploreTopic('固有免疫')">固有免疫</span>
+                                    <span class="topic-chip" onclick="exploreTopic('补体系统')">补体系统</span>
+                                    <span class="topic-chip" onclick="exploreTopic('MHC')">MHC</span>
+                                    <span class="topic-chip" onclick="exploreTopic('T细胞')">T细胞</span>
+                                    <span class="topic-chip" onclick="exploreTopic('抗体')">抗体</span>
+                                    <span class="topic-chip" onclick="exploreTopic('超敏反应')">超敏反应</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="coach-input" placeholder="输入你想学习的主题或问题..." onkeypress="if(event.key==='Enter')sendCoachMessage()">
+                        <button class="btn btn-primary" onclick="sendCoachMessage()">发送</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 知识卡片 -->
+            <div id="knowledge" class="section">
+                <!-- 搜索和筛选栏 -->
+                <div class="knowledge-header">
+                    <div class="search-box">
+                        <input type="text" id="knowledge-search" placeholder="搜索知识点（如：补体、T细胞、抗体...）" 
+                               onkeypress="if(event.key==='Enter')searchKnowledge()">
+                        <button class="btn btn-primary" onclick="searchKnowledge()">🔍 搜索</button>
+                    </div>
+                    <div class="filter-box">
+                        <label>筛选模块：</label>
+                        <select id="knowledge-module-filter" onchange="filterKnowledgeCards()">
+                            <option value="">全部模块</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="showAllConcepts()">📖 浏览所有知识点</button>
+                    </div>
+                </div>
+
+                <!-- 搜索结果 -->
+                <div id="search-results" style="display:none;">
+                    <h3 id="search-results-title"></h3>
+                    <div id="search-results-content"></div>
+                </div>
+
+                <!-- 所有知识点列表 -->
+                <div id="all-concepts-list" style="display:none;">
+                    <h3 id="all-concepts-title"></h3>
+                    <div id="all-concepts-content"></div>
+                </div>
+
+                <!-- 模块列表 -->
+                <div id="module-list">
+                    <h2 style="margin-bottom:20px;">学习模块</h2>
+                    <div class="module-grid" id="module-grid"></div>
+                </div>
+
+                <!-- 模块详情 -->
+                <div id="module-detail" class="module-detail">
+                    <div class="back-btn" onclick="showModuleList()">← 返回模块列表</div>
+                    <div id="module-content"></div>
+                </div>
+
+                <!-- 概念详情卡片 -->
+                <div id="concept-detail-modal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close-modal" onclick="closeConceptDetail()">&times;</span>
+                        <div id="concept-detail-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 练习 -->
+            <div id="quiz" class="section">
+                <div id="quiz-setup">
+                    <div class="card">
+                        <div class="card-title">📝 开始练习</div>
+                        <div class="quiz-settings">
+                            <label>
+                                题量：
+                                <input type="number" id="quiz-count" value="5" min="1" max="25">
+                            </label>
+                            <label>
+                                模块：
+                                <select id="quiz-module">
+                                    <option value="">全部</option>
+                                </select>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="startQuiz()">开始练习</button>
+                    </div>
+                </div>
+                <div id="quiz-area" style="display:none;"></div>
+            </div>
+
+            <!-- 学习进度 -->
+            <div id="progress" class="section">
+                <div id="progress-content">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 错题本 -->
+            <div id="wrong" class="section">
+                <div id="wrong-content">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局状态 ====================
+        let currentCards = [];
+        let currentIndex = 0;
+        let results = [];
+        let deckPath = 'decks/people9-core.json';
+        let startTime = null;
+        let currentTopic = null;
+        let conversationState = 'idle'; // idle, exploring, explaining, checking
+
+        // ==================== 导航 ====================
+        const tabs = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+
+                if (targetId === 'knowledge') {
+                    loadModules();
+                    // 重置视图
+                    document.getElementById('module-list').style.display = 'block';
+                    document.getElementById('module-detail').classList.remove('active');
+                    document.getElementById('search-results').style.display = 'none';
+                    document.getElementById('all-concepts-list').style.display = 'none';
+                }
+                if (targetId === 'progress') loadProgress();
+                if (targetId === 'wrong') loadWrongCards();
+            });
+        });
+
+        // ==================== 学习教练 ====================
+        function addChatMessage(type, content) {
+            const container = document.getElementById('chat-container');
+            const msg = document.createElement('div');
+            msg.className = `chat-message ${type}`;
+            msg.innerHTML = `
+                <div class="chat-avatar">${type === 'coach' ? '🎓' : '👤'}</div>
+                <div class="chat-bubble">${content}</div>
+            `;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function exploreTopic(topic) {
+            document.getElementById('coach-input').value = topic;
+            sendCoachMessage();
+        }
+
+        async function sendCoachMessage() {
+            const input = document.getElementById('coach-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addChatMessage('user', escapeHtml(message));
+            input.value = '';
+
+            if (conversationState === 'idle' || conversationState === 'exploring') {
+                await explorePhase(message);
+            } else if (conversationState === 'explaining') {
+                await checkUnderstanding(message);
+            } else {
+                await explorePhase(message);
+            }
+        }
+
+        async function explorePhase(topic) {
+            currentTopic = topic;
+            conversationState = 'exploring';
+
+            try {
+                const res = await fetch('/api/coach/explore', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic }),
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    let content = `<p>好的，我们来学习「<strong>${escapeHtml(topic)}</strong>」</p>`;
+                    content += `<p style="margin-top:10px;">在我讲解之前，先让我了解一下你的基础：</p>`;
+                    content += `<p style="margin-top:8px;color:var(--primary);">${data.explore_questions[0]}</p>`;
+                    
+                    if (data.related_module) {
+                        content += `<p style="margin-top:12px;font-size:0.9rem;color:var(--text-light);">📖 相关模块：${data.related_module.title}</p>`;
+                    }
+                    
+                    content += `<div style="margin-top:12px;"><button class="btn btn-secondary" onclick="skipToExplain()" style="font-size:0.85rem;padding:8px 16px;">跳过，直接讲解</button></div>`;
+                    
+                    addChatMessage('coach', content);
+                }
+            } catch (e) {
+                addChatMessage('coach', '抱歉，出现了一些问题，请重试。');
+            }
+        }
+
+        async function skipToExplain() {
+            await explainPhase('我想直接学习');
+        }
+
+        async function explainPhase(understanding) {
+            conversationState = 'explaining';
+
+            try {
+                const res = await fetch('/api/coach/explain', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: currentTopic, understanding }),
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    let content = '';
+                    
+                    if (data.concept) {
+                        content += `<div class="concept-card">
+                            <div class="concept-term">${escapeHtml(data.concept.term)}</div>
+                            <div class="concept-definition">${escapeHtml(data.concept.definition)}</div>
+                            <div class="concept-points">
+                                ${data.concept.key_points.map(p => `<span class="concept-point">${escapeHtml(p)}</span>`).join('')}
+                            </div>
+                            ${data.concept.memory_tip ? `<div class="concept-tip">💡 记忆技巧：${escapeHtml(data.concept.memory_tip)}</div>` : ''}
+                        </div>`;
+                    }
+
+                    if (data.confusions && data.confusions.length > 0) {
+                        content += `<p style="margin-top:12px;"><strong>⚠️ 常见混淆点：</strong></p>`;
+                        data.confusions.forEach(c => {
+                            content += `<div style="margin:8px 0;padding:10px;background:#fef3c7;border-radius:8px;">
+                                <strong>${c.pair.join(' vs ')}</strong>：${escapeHtml(c.difference)}
+                            </div>`;
+                        });
+                    }
+
+                    if (data.clinical_links && data.clinical_links.length > 0) {
+                        content += `<p style="margin-top:12px;"><strong>🏥 临床关联：</strong></p>`;
+                        data.clinical_links.forEach(link => {
+                            content += `<div style="margin:6px 0;padding:8px 12px;background:#ecfdf5;border-radius:6px;font-size:0.9rem;">${escapeHtml(link)}</div>`;
+                        });
+                    }
+
+                    content += `<p style="margin-top:16px;color:var(--primary);"><strong>📝 理解检验：</strong></p>`;
+                    content += `<p>${data.check_questions[0]}</p>`;
+                    content += `<div style="margin-top:12px;">
+                        <button class="btn btn-primary" onclick="startTopicQuiz()" style="font-size:0.85rem;padding:8px 16px;">做几道题巩固一下</button>
+                    </div>`;
+
+                    addChatMessage('coach', content);
+                }
+            } catch (e) {
+                addChatMessage('coach', '抱歉，出现了一些问题，请重试。');
+            }
+        }
+
+        async function checkUnderstanding(response) {
+            // 简单的反馈
+            let content = `<p>很好！你对「${currentTopic}」的理解正在建立。</p>`;
+            content += `<p style="margin-top:10px;">要不要继续探索其他主题，或者做几道题巩固一下？</p>`;
+            content += `<div class="quick-topics" style="margin-top:12px;">
+                <span class="topic-chip" onclick="startTopicQuiz()">做题巩固</span>
+                <span class="topic-chip" onclick="exploreTopic('补体系统')">学习补体</span>
+                <span class="topic-chip" onclick="exploreTopic('T细胞')">学习T细胞</span>
+            </div>`;
+            
+            addChatMessage('coach', content);
+            conversationState = 'idle';
+        }
+
+        async function startTopicQuiz() {
+            if (!currentTopic) return;
+            
+            try {
+                const res = await fetch('/api/coach/quiz-topic', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: currentTopic, n: 3 }),
+                });
+                const data = await res.json();
+
+                if (data.success && data.cards.length > 0) {
+                    addChatMessage('coach', `<p>好的，我为你准备了 ${data.cards.length} 道关于「${currentTopic}」的题目。</p><p style="margin-top:8px;">正在跳转到练习界面...</p>`);
+                    
+                    setTimeout(() => {
+                        currentCards = data.cards;
+                        currentIndex = 0;
+                        results = [];
+                        
+                        document.querySelector('[data-tab="quiz"]').click();
+                        document.getElementById('quiz-setup').style.display = 'none';
+                        document.getElementById('quiz-area').style.display = 'block';
+                        showQuestion();
+                    }, 1000);
+                } else {
+                    addChatMessage('coach', '没有找到相关的练习题，试试其他主题吧！');
+                }
+            } catch (e) {
+                addChatMessage('coach', '加载题目失败，请重试。');
+            }
+        }
+
+        // ==================== 知识卡片 ====================
+        async function loadModules() {
+            try {
+                const res = await fetch('/api/knowledge/modules');
+                const data = await res.json();
+
+                if (data.success) {
+                    const grid = document.getElementById('module-grid');
+                    grid.innerHTML = data.modules.map((m, i) => `
+                        <div class="module-card" onclick="showModuleDetail('${m.id}')">
+                            <div class="module-number">${String(i + 1).padStart(2, '0')}</div>
+                            <div class="module-title">${escapeHtml(m.title)}</div>
+                            <div class="module-objectives">${m.objectives[0]}</div>
+                        </div>
+                    `).join('');
+                    
+                    // 填充练习页面的模块选择
+                    const select = document.getElementById('quiz-module');
+                    if (select.options.length <= 1) {
+                        data.modules.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id;
+                            opt.textContent = m.title;
+                            select.appendChild(opt);
+                        });
+                    }
+
+                    // 填充知识卡片筛选下拉框
+                    const filterSelect = document.getElementById('knowledge-module-filter');
+                    if (filterSelect.options.length <= 1) {
+                        data.modules.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id;
+                            opt.textContent = m.title;
+                            filterSelect.appendChild(opt);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load modules:', e);
+            }
+        }
+
+        // 搜索知识点
+        async function searchKnowledge() {
+            const term = document.getElementById('knowledge-search').value.trim();
+            if (!term) {
+                alert('请输入搜索关键词');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/knowledge/search?term=${encodeURIComponent(term)}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    // 隐藏其他视图
+                    document.getElementById('module-list').style.display = 'none';
+                    document.getElementById('module-detail').classList.remove('active');
+                    document.getElementById('all-concepts-list').style.display = 'none';
+
+                    if (data.found && data.concepts.length > 0) {
+                        const resultsDiv = document.getElementById('search-results');
+                        const titleDiv = document.getElementById('search-results-title');
+                        const contentDiv = document.getElementById('search-results-content');
+
+                        titleDiv.innerHTML = `找到 ${data.count} 个相关知识点（显示前 ${data.concepts.length} 个）`;
+                        
+                        contentDiv.innerHTML = `
+                            <div class="concepts-grid">
+                                ${data.concepts.map(c => `
+                                    <div class="concept-card-clickable" onclick="showConceptDetail('${c.module_id}', '${escapeHtml(c.term)}')">
+                                        <div class="concept-module-badge">${escapeHtml(c.module)}</div>
+                                        <div class="concept-term">${escapeHtml(c.term)}</div>
+                                        <div class="concept-definition" style="font-size:0.9rem;color:var(--text-light);margin-top:8px;">
+                                            ${escapeHtml(c.definition.substring(0, 100))}${c.definition.length > 100 ? '...' : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+
+                        resultsDiv.style.display = 'block';
+                    } else {
+                        document.getElementById('search-results-content').innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">🔍</div>
+                                <div class="empty-title">未找到相关知识点</div>
+                                <p>试试其他关键词，或浏览所有知识点</p>
+                            </div>
+                        `;
+                        document.getElementById('search-results').style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.error('Search failed:', e);
+                alert('搜索失败，请重试');
+            }
+        }
+
+        // 显示所有知识点
+        async function showAllConcepts() {
+            const moduleId = document.getElementById('knowledge-module-filter').value;
+
+            try {
+                const url = moduleId 
+                    ? `/api/knowledge/concepts?module_id=${moduleId}`
+                    : '/api/knowledge/concepts';
+                
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.success) {
+                    // 隐藏其他视图
+                    document.getElementById('module-list').style.display = 'none';
+                    document.getElementById('module-detail').classList.remove('active');
+                    document.getElementById('search-results').style.display = 'none';
+
+                    const listDiv = document.getElementById('all-concepts-list');
+                    const titleDiv = document.getElementById('all-concepts-title');
+                    const contentDiv = document.getElementById('all-concepts-content');
+
+                    const moduleName = moduleId 
+                        ? document.getElementById('knowledge-module-filter').selectedOptions[0].text
+                        : '全部模块';
+
+                    titleDiv.innerHTML = `${moduleName} - 共 ${data.count} 个知识点`;
+
+                    contentDiv.innerHTML = `
+                        <div class="concepts-grid">
+                            ${data.concepts.map(c => `
+                                <div class="concept-card-clickable" onclick="showConceptDetail('${c.module_id}', '${escapeHtml(c.term)}')">
+                                    <div class="concept-module-badge">${escapeHtml(c.module)}</div>
+                                    <div class="concept-term">${escapeHtml(c.term)}</div>
+                                    <div class="concept-definition" style="font-size:0.9rem;color:var(--text-light);margin-top:8px;">
+                                        ${escapeHtml(c.definition.substring(0, 100))}${c.definition.length > 100 ? '...' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                    listDiv.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Failed to load concepts:', e);
+                alert('加载失败，请重试');
+            }
+        }
+
+        // 筛选知识卡片
+        function filterKnowledgeCards() {
+            const moduleId = document.getElementById('knowledge-module-filter').value;
+            if (moduleId) {
+                showAllConcepts();
+            }
+        }
+
+        // 显示概念详情
+        async function showConceptDetail(moduleId, term) {
+            try {
+                const res = await fetch(`/api/knowledge/module/${moduleId}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    const concept = data.module.key_concepts.find(c => c.term === term);
+                    if (concept) {
+                        const modal = document.getElementById('concept-detail-modal');
+                        const content = document.getElementById('concept-detail-content');
+
+                        content.innerHTML = `
+                            <h2 style="margin-bottom:20px;color:var(--primary);">${escapeHtml(concept.term)}</h2>
+                            <div class="concept-module-badge" style="margin-bottom:16px;">${escapeHtml(data.module.title)}</div>
+                            
+                            <div class="concept-card">
+                                <div class="concept-definition" style="font-size:1.05rem;margin-bottom:16px;">
+                                    ${escapeHtml(concept.definition)}
+                                </div>
+                                <div class="concept-points">
+                                    ${concept.key_points.map(p => `<span class="concept-point">${escapeHtml(p)}</span>`).join('')}
+                                </div>
+                                ${concept.memory_tip ? `<div class="concept-tip" style="margin-top:12px;">💡 ${escapeHtml(concept.memory_tip)}</div>` : ''}
+                            </div>
+
+                            <div style="margin-top:24px;">
+                                <button class="btn btn-primary" onclick="startModuleQuiz('${moduleId}')">📝 做这个模块的题</button>
+                                <button class="btn btn-secondary" onclick="closeConceptDetail()" style="margin-left:12px;">关闭</button>
+                            </div>
+                        `;
+
+                        modal.style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load concept detail:', e);
+                alert('加载失败，请重试');
+            }
+        }
+
+        // 关闭概念详情
+        function closeConceptDetail() {
+            document.getElementById('concept-detail-modal').style.display = 'none';
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('concept-detail-modal');
+            if (event.target === modal) {
+                closeConceptDetail();
+            }
+        }
+
+        async function showModuleDetail(moduleId) {
+            try {
+                const res = await fetch(`/api/knowledge/module/${moduleId}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    const m = data.module;
+                    let html = `<h2 style="margin-bottom:20px;">${escapeHtml(m.title)}</h2>`;
+                    
+                    // 学习目标
+                    html += `<div class="knowledge-section">
+                        <h3>🎯 学习目标</h3>
+                        <ul style="padding-left:20px;">
+                            ${m.objectives.map(o => `<li>${escapeHtml(o)}</li>`).join('')}
+                        </ul>
+                    </div>`;
+
+                    // 核心概念
+                    html += `<div class="knowledge-section">
+                        <h3>📖 核心概念</h3>
+                        ${m.key_concepts.map(c => `
+                            <div class="concept-card">
+                                <div class="concept-term">${escapeHtml(c.term)}</div>
+                                <div class="concept-definition">${escapeHtml(c.definition)}</div>
+                                <div class="concept-points">
+                                    ${c.key_points.map(p => `<span class="concept-point">${escapeHtml(p)}</span>`).join('')}
+                                </div>
+                                ${c.memory_tip ? `<div class="concept-tip">💡 ${escapeHtml(c.memory_tip)}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>`;
+
+                    // 易混淆点
+                    if (m.confusions && m.confusions.length > 0) {
+                        html += `<div class="knowledge-section">
+                            <h3>⚠️ 常见混淆点</h3>
+                            ${m.confusions.map(c => `
+                                <div class="confusion-card">
+                                    <div class="confusion-pair">${c.pair.join(' vs ')}</div>
+                                    <div class="confusion-diff">${escapeHtml(c.difference)}</div>
+                                    <div class="confusion-trap">🎯 考点陷阱：${escapeHtml(c.exam_trap)}</div>
+                                </div>
+                            `).join('')}
+                        </div>`;
+                    }
+
+                    // 临床关联
+                    if (m.clinical_links && m.clinical_links.length > 0) {
+                        html += `<div class="knowledge-section">
+                            <h3>🏥 临床关联</h3>
+                            ${m.clinical_links.map(l => `<div class="clinical-link">${escapeHtml(l)}</div>`).join('')}
+                        </div>`;
+                    }
+
+                    // 练习按钮
+                    html += `<div style="margin-top:24px;">
+                        <button class="btn btn-primary" onclick="startModuleQuiz('${moduleId}')">📝 做这个模块的题</button>
+                    </div>`;
+
+                    document.getElementById('module-content').innerHTML = html;
+                    document.getElementById('module-list').style.display = 'none';
+                    document.getElementById('module-detail').classList.add('active');
+                }
+            } catch (e) {
+                console.error('Failed to load module detail:', e);
+            }
+        }
+
+        function showModuleList() {
+            document.getElementById('module-detail').classList.remove('active');
+            document.getElementById('module-list').style.display = 'block';
+        }
+
+        async function startModuleQuiz(moduleId) {
+            document.querySelector('[data-tab="quiz"]').click();
+            document.getElementById('quiz-module').value = moduleId;
+            startQuiz();
+        }
+
+        // ==================== 练习 ====================
+        async function startQuiz() {
+            const n = parseInt(document.getElementById('quiz-count').value) || 5;
+            const moduleId = document.getElementById('quiz-module').value;
+            const tags = moduleId ? [moduleId] : null;
+
+            try {
+                const res = await fetch('/api/quiz/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deck: deckPath, n, tags }),
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert(data.error || '加载失败');
+                    return;
+                }
+
+                if (data.cards.length === 0) {
+                    document.getElementById('quiz-area').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-title">暂无题目</div>
+                            <p>该模块暂无练习题</p>
+                        </div>
+                    `;
+                    document.getElementById('quiz-area').style.display = 'block';
+                    document.getElementById('quiz-setup').style.display = 'none';
+                    return;
+                }
+
+                currentCards = data.cards;
+                currentIndex = 0;
+                results = [];
+
+                document.getElementById('quiz-setup').style.display = 'none';
+                document.getElementById('quiz-area').style.display = 'block';
+                showQuestion();
+            } catch (e) {
+                console.error('Error starting quiz:', e);
+                alert('请求失败');
+            }
+        }
+
+        function showQuestion() {
+            const card = currentCards[currentIndex];
+            const area = document.getElementById('quiz-area');
+            startTime = Date.now();
+
+            let html = `
+                <div class="card">
+                    <div class="question-header">
+                        <span class="question-progress">第 ${currentIndex + 1} / ${currentCards.length} 题</span>
+                        <div class="question-tags">
+                            ${(card.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+                        </div>
+                    </div>
+            `;
+
+            if (card.type === 'mcq') {
+                html += `
+                    <div class="question-stem">${escapeHtml(card.stem)}</div>
+                    <div class="choices">
+                        ${card.choices.map((c, i) => `
+                            <div class="choice" data-index="${i}" onclick="selectChoice(this)">
+                                <span class="choice-letter">${String.fromCharCode(65 + i)}</span>
+                                <span class="choice-text">${escapeHtml(c)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="question-stem">${escapeHtml(card.prompt)}</div>
+                    <input type="text" class="short-input" id="short-answer" placeholder="输入你的答案..." onkeypress="if(event.key==='Enter')submitShort()">
+                    <div style="margin-top:16px;">
+                        <button class="btn btn-primary btn-block" onclick="submitShort()">提交答案</button>
+                    </div>
+                `;
+            }
+
+            html += `
+                    <div id="result-area"></div>
+                    <div id="next-area" style="display:none;margin-top:16px;">
+                        <button class="btn btn-primary btn-block" id="next-btn" onclick="nextQuestion()">下一题</button>
+                    </div>
+                </div>
+            `;
+
+            area.innerHTML = html;
+        }
+
+        async function selectChoice(el) {
+            if (el.classList.contains('disabled')) return;
+
+            document.querySelectorAll('.choice').forEach(c => {
+                c.classList.add('disabled');
+                c.style.cursor = 'default';
+            });
+            el.classList.add('selected');
+
+            const index = parseInt(el.dataset.index);
+            const answer = String.fromCharCode(65 + index);
+            await submitAnswer(answer);
+        }
+
+        async function submitShort() {
+            const input = document.getElementById('short-answer');
+            const answer = input.value.trim();
+            if (!answer) {
+                alert('请输入答案');
+                return;
+            }
+            input.disabled = true;
+            await submitAnswer(answer);
+        }
+
+        async function submitAnswer(answer) {
+            const card = currentCards[currentIndex];
+            const elapsed = Date.now() - startTime;
+
+            try {
+                const res = await fetch('/api/quiz/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        deck: deckPath,
+                        card_id: card.id,
+                        answer,
+                        elapsed_ms: elapsed,
+                    }),
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert(data.error || '提交失败');
+                    return;
+                }
+
+                results.push({ card_id: card.id, correct: data.correct });
+                showResult(data);
+            } catch (e) {
+                console.error('Error submitting answer:', e);
+                alert('提交失败');
+            }
+        }
+
+        function showResult(data) {
+            const card = currentCards[currentIndex];
+            const resultArea = document.getElementById('result-area');
+
+            if (card.type === 'mcq') {
+                const correctIdx = data.correct_answer.charCodeAt(0) - 65;
+                document.querySelectorAll('.choice').forEach((c, i) => {
+                    if (i === correctIdx) {
+                        c.classList.add('correct');
+                    } else if (c.classList.contains('selected') && !data.correct) {
+                        c.classList.add('wrong');
+                    }
+                });
+            }
+
+            let html = `
+                <div class="result-card ${data.correct ? 'correct' : 'wrong'}">
+                    <div class="result-header">
+                        <span class="result-icon">${data.correct ? '✅' : '❌'}</span>
+                        <span class="result-title">${data.correct ? '回答正确！' : '回答错误'}</span>
+                    </div>
+                    <div class="result-answer">
+                        <strong>正确答案：</strong>${escapeHtml(card.type === 'mcq' ? `${data.correct_answer}. ${data.correct_text}` : data.correct_answer)}
+                    </div>
+                    ${data.explain ? `<div class="result-explain"><strong>解析：</strong>${escapeHtml(data.explain)}</div>` : ''}
+            `;
+
+            // 如果答错，显示学习引导
+            if (!data.correct && data.learning_guide) {
+                const guide = data.learning_guide;
+                html += `<div class="learning-guide">
+                    <h4>📚 学习建议</h4>
+                `;
+
+                if (guide.related_concepts && guide.related_concepts.length > 0) {
+                    html += `<p style="margin-bottom:8px;"><strong>相关概念：</strong></p>`;
+                    guide.related_concepts.forEach(c => {
+                        html += `<div style="margin:6px 0;padding:8px 12px;background:var(--bg);border-radius:6px;">
+                            <strong>${escapeHtml(c.term)}</strong>：${escapeHtml(c.definition)}
+                        </div>`;
+                    });
+                }
+
+                if (guide.confusions && guide.confusions.length > 0) {
+                    html += `<p style="margin-top:12px;margin-bottom:8px;"><strong>⚠️ 注意混淆点：</strong></p>`;
+                    guide.confusions.forEach(c => {
+                        html += `<div style="margin:6px 0;padding:8px 12px;background:#fef3c7;border-radius:6px;">
+                            ${c.pair.join(' vs ')}：${escapeHtml(c.difference)}
+                        </div>`;
+                    });
+                }
+
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            resultArea.innerHTML = html;
+
+            // Show next button
+            const nextArea = document.getElementById('next-area');
+            nextArea.style.display = 'block';
+            document.getElementById('next-btn').textContent = currentIndex >= currentCards.length - 1 ? '查看结果' : '下一题';
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex >= currentCards.length) {
+                showSummary();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function showSummary() {
+            const correct = results.filter(r => r.correct).length;
+            const total = results.length;
+            const percentage = Math.round((correct / total) * 100);
+
+            let scoreClass = 'low';
+            if (percentage >= 80) scoreClass = 'high';
+            else if (percentage >= 60) scoreClass = 'mid';
+
+            document.getElementById('quiz-area').innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-score ${scoreClass}">${correct}/${total}</div>
+                    <div class="summary-text">正确率 ${percentage}%</div>
+                    <div style="display:flex;gap:12px;justify-content:center;">
+                        <button class="btn btn-primary" onclick="resetQuiz()">再来一次</button>
+                        <button class="btn btn-secondary" onclick="document.querySelector('[data-tab=\\'wrong\\']').click()">查看错题本</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-setup').style.display = 'block';
+            document.getElementById('quiz-area').style.display = 'none';
+        }
+
+        // ==================== 学习进度 ====================
+        async function loadProgress() {
+            const content = document.getElementById('progress-content');
+            try {
+                const res = await fetch('/api/progress/overview');
+                const data = await res.json();
+
+                if (!data.success) {
+                    content.innerHTML = '<div class="empty-state"><p>加载失败</p></div>';
+                    return;
+                }
+
+                let html = `
+                    <div class="progress-overview">
+                        <div class="progress-stat">
+                            <div class="progress-stat-value">${data.total_cards}</div>
+                            <div class="progress-stat-label">题库总题数</div>
+                        </div>
+                        <div class="progress-stat">
+                            <div class="progress-stat-value">${data.stats.total}</div>
+                            <div class="progress-stat-label">累计做题</div>
+                        </div>
+                        <div class="progress-stat">
+                            <div class="progress-stat-value" style="color:var(--danger);">${data.wrong_count}</div>
+                            <div class="progress-stat-label">错题数</div>
+                        </div>
+                    </div>
+                    <h3 style="margin-bottom:16px;">📊 各模块进度</h3>
+                    <div class="module-progress-list">
+                `;
+
+                for (const [id, p] of Object.entries(data.module_progress)) {
+                    html += `
+                        <div class="module-progress-item">
+                            <div class="module-progress-info">
+                                <div class="module-progress-title">${escapeHtml(p.title)}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill" style="width:${p.progress}%"></div>
+                                </div>
+                            </div>
+                            <div class="module-progress-percent">${p.progress}%</div>
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+                content.innerHTML = html;
+            } catch (e) {
+                console.error('Error loading progress:', e);
+                content.innerHTML = '<div class="empty-state"><p>加载失败</p></div>';
+            }
+        }
+
+        // ==================== 错题本 ====================
+        async function loadWrongCards() {
+            const content = document.getElementById('wrong-content');
+            try {
+                const res = await fetch(`/api/wrong?deck=${encodeURIComponent(deckPath)}`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    content.innerHTML = '<div class="empty-state"><p>加载失败</p></div>';
+                    return;
+                }
+
+                if (data.count === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🎉</div>
+                            <div class="empty-title">太棒了！没有错题</div>
+                            <p>继续保持！</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                content.innerHTML = `
+                    <div class="card">
+                        <div class="card-title">📕 错题本</div>
+                        <p style="margin-bottom:16px;">共 <strong>${data.count}</strong> 道错题需要复习</p>
+                        <div class="wrong-list">
+                            ${data.wrong_cards.map(id => `<span class="wrong-item">${escapeHtml(id)}</span>`).join('')}
+                        </div>
+                        <div style="margin-top:20px;">
+                            <button class="btn btn-primary btn-block" onclick="reviewWrongCards()">复习错题</button>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error('Error loading wrong cards:', e);
+                content.innerHTML = '<div class="empty-state"><p>加载失败</p></div>';
+            }
+        }
+
+        async function reviewWrongCards() {
+            try {
+                const res = await fetch('/api/review/cards', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deck: deckPath, n: 10, only_wrong: true }),
+                });
+                const data = await res.json();
+
+                if (data.success && data.cards.length > 0) {
+                    currentCards = data.cards;
+                    currentIndex = 0;
+                    results = [];
+
+                    document.querySelector('[data-tab="quiz"]').click();
+                    document.getElementById('quiz-setup').style.display = 'none';
+                    document.getElementById('quiz-area').style.display = 'block';
+                    showQuestion();
+                } else {
+                    alert('暂无到期错题');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+            }
+        }
+
+        // ==================== 工具函数 ====================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== 初始化 ====================
+        loadModules();
+    </script>
+</body>
+</html>

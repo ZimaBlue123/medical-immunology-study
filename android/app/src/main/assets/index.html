@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>医学免疫学学习系统</title>
+    
+    <!-- 加载数据文件 -->
+    <script src="js/knowledge-base.js"></script>
+    <script src="js/deck-data.js"></script>
+    <script src="js/api.js"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 10px;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
+
+        /* Navigation */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 4px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            touch-action: manipulation;
+        }
+
+        .nav-btn:active {
+            background: rgba(255,255,255,0.25);
+            transform: scale(0.95);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .nav-btn .icon {
+            font-size: 1.3rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        .section {
+            display: none;
+            padding: 15px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:active {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 学习教练 */
+        .coach-section {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 250px);
+            min-height: 400px;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .chat-message.coach .chat-avatar {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        }
+
+        .chat-message.user .chat-avatar {
+            background: var(--success);
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 12px 15px;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        .chat-message.coach .chat-bubble {
+            background: white;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .quick-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .topic-chip {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .topic-chip:active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(0.95);
+        }
+
+        /* 知识卡片样式 */
+        .concept-card {
+            background: white;
+            border-radius: 12px;
+            padding: 14px;
+            margin: 10px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .concept-term {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .concept-definition {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .concept-points {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+
+        .concept-point {
+            padding: 3px 8px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .concept-tip {
+            font-size: 0.85rem;
+            color: var(--warning);
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .module-card:active {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+            transform: scale(0.98);
+        }
+
+        .module-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white;
+            border-radius: 6px;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .module-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .module-objectives {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* 知识卡片搜索 */
+        .knowledge-header {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .filter-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .filter-box select {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .concept-card-clickable {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .concept-card-clickable:active {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+            transform: scale(0.98);
+        }
+
+        .concept-module-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: var(--radius);
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-light);
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:active {
+            color: var(--text);
+            transform: scale(0.9);
+        }
+
+        /* 练习界面 */
+        .quiz-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .quiz-stem {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .quiz-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .choice-btn {
+            padding: 12px 15px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .choice-btn:active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .choice-btn.correct {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .choice-btn.wrong {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.3rem; }
+            .nav-btn { padding: 8px 2px; font-size: 0.65rem; }
+            .nav-btn .icon { font-size: 1.1rem; }
+            .module-grid { grid-template-columns: 1fr; }
+            .concepts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>医学免疫学学习系统</h1>
+            <p>Guided Learning | 引导式学习</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-grid">
+            <button class="nav-btn active" data-tab="coach">
+                <span class="icon">💬</span>
+                <span>学习教练</span>
+            </button>
+            <button class="nav-btn" data-tab="knowledge">
+                <span class="icon">📚</span>
+                <span>知识卡片</span>
+            </button>
+            <button class="nav-btn" data-tab="quiz">
+                <span class="icon">✏️</span>
+                <span>练习</span>
+            </button>
+            <button class="nav-btn" data-tab="progress">
+                <span class="icon">📊</span>
+                <span>进度</span>
+            </button>
+            <button class="nav-btn" data-tab="wrong">
+                <span class="icon">📕</span>
+                <span>错题本</span>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- 学习教练 -->
+            <div id="coach" class="section active">
+                <div class="coach-section">
+                    <div class="chat-container" id="chat-container">
+                        <div class="chat-message coach">
+                            <div class="chat-avatar">🎓</div>
+                            <div class="chat-bubble">
+                                <p>你好！我是你的医学免疫学学习教练。</p>
+                                <p style="margin-top:8px;">你想学习哪个主题？可以直接输入，或点击下方快捷按钮：</p>
+                                <div class="quick-topics">
+                                    <span class="topic-chip" onclick="exploreTopic('固有免疫')">固有免疫</span>
+                                    <span class="topic-chip" onclick="exploreTopic('补体系统')">补体系统</span>
+                                    <span class="topic-chip" onclick="exploreTopic('MHC')">MHC</span>
+                                    <span class="topic-chip" onclick="exploreTopic('T细胞')">T细胞</span>
+                                    <span class="topic-chip" onclick="exploreTopic('抗体')">抗体</span>
+                                    <span class="topic-chip" onclick="exploreTopic('超敏反应')">超敏反应</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="coach-input" placeholder="输入你想学习的主题或问题..." onkeypress="if(event.key==='Enter')sendCoachMessage()">
+                        <button class="btn btn-primary" onclick="sendCoachMessage()">发送</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 知识卡片 -->
+            <div id="knowledge" class="section">
+                <div class="knowledge-header">
+                    <div class="search-box">
+                        <input type="text" id="knowledge-search" placeholder="搜索知识点..." onkeypress="if(event.key==='Enter')searchKnowledge()">
+                        <button class="btn btn-primary" onclick="searchKnowledge()">🔍</button>
+                    </div>
+                    <div class="filter-box">
+                        <label>模块：</label>
+                        <select id="knowledge-module-filter" onchange="filterKnowledgeCards()">
+                            <option value="">全部</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="showAllConcepts()">📖 浏览</button>
+                    </div>
+                </div>
+
+                <div id="search-results" style="display:none;">
+                    <h3 id="search-results-title"></h3>
+                    <div id="search-results-content"></div>
+                </div>
+
+                <div id="all-concepts-list" style="display:none;">
+                    <h3 id="all-concepts-title"></h3>
+                    <div id="all-concepts-content"></div>
+                </div>
+
+                <div id="module-list">
+                    <h2 style="margin-bottom:15px;">学习模块</h2>
+                    <div class="module-grid" id="module-grid"></div>
+                </div>
+
+                <div id="module-detail" class="module-detail" style="display:none;">
+                    <div class="back-btn" onclick="showModuleList()" style="margin-bottom:15px;padding:8px;background:var(--bg);border-radius:8px;cursor:pointer;text-align:center;">← 返回</div>
+                    <div id="module-content"></div>
+                </div>
+
+                <div id="concept-detail-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-modal" onclick="closeConceptDetail()">&times;</span>
+                        <div id="concept-detail-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 练习 -->
+            <div id="quiz" class="section">
+                <div id="quiz-setup">
+                    <div class="card">
+                        <div class="card-title">📝 开始练习</div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:8px;">题量：</label>
+                            <input type="number" id="quiz-count" value="5" min="1" max="25" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:8px;">模块：</label>
+                            <select id="quiz-module" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;">
+                                <option value="">全部</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="startQuiz()">开始练习</button>
+                    </div>
+                </div>
+                <div id="quiz-area" style="display:none;"></div>
+            </div>
+
+            <!-- 学习进度 -->
+            <div id="progress" class="section">
+                <div id="progress-content">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 错题本 -->
+            <div id="wrong" class="section">
+                <div id="wrong-content">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局状态 ====================
+        let currentCards = [];
+        let currentIndex = 0;
+        let results = [];
+        let deckPath = 'decks/people9-core.json';
+        let startTime = null;
+        let currentTopic = null;
+        let conversationState = 'idle';
+
+        // ==================== 工具函数 ====================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== 导航 ====================
+        const tabs = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+
+                if (targetId === 'knowledge') loadModules();
+                if (targetId === 'progress') loadProgress();
+                if (targetId === 'wrong') loadWrongCards();
+            });
+        });
+
+        // ==================== 学习教练 ====================
+        function addChatMessage(type, content) {
+            const container = document.getElementById('chat-container');
+            const msg = document.createElement('div');
+            msg.className = `chat-message ${type}`;
+            msg.innerHTML = `
+                <div class="chat-avatar">${type === 'coach' ? '🎓' : '👤'}</div>
+                <div class="chat-bubble">${content}</div>
+            `;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function exploreTopic(topic) {
+            document.getElementById('coach-input').value = topic;
+            sendCoachMessage();
+        }
+
+        async function sendCoachMessage() {
+            const input = document.getElementById('coach-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addChatMessage('user', escapeHtml(message));
+            input.value = '';
+
+            if (conversationState === 'idle' || conversationState === 'exploring') {
+                await explorePhase(message);
+            } else if (conversationState === 'explaining') {
+                await checkUnderstanding(message);
+            } else {
+                await explorePhase(message);
+            }
+        }
+
+        async function explorePhase(topic) {
+            currentTopic = topic;
+            conversationState = 'exploring';
+
+            try {
+                const data = await API.searchKnowledge(topic);
+
+                if (data.success) {
+                    let content = `<p>好的，我们来学习「<strong>${escapeHtml(topic)}</strong>」</p>`;
+                    content += `<p style="margin-top:10px;">在我讲解之前，先让我了解一下你的基础：</p>`;
+                    content += `<p style="margin-top:8px;color:var(--primary);">你对「${escapeHtml(topic)}」目前的理解是什么？</p>`;
+                    
+                    if (data.found && data.concepts.length > 0) {
+                        content += `<p style="margin-top:12px;font-size:0.9rem;color:var(--text-light);">📖 找到 ${data.count} 个相关知识点</p>`;
+                    }
+                    
+                    content += `<div style="margin-top:12px;"><button class="btn btn-secondary" onclick="skipToExplain()" style="font-size:0.85rem;padding:6px 12px;">跳过，直接讲解</button></div>`;
+                    
+                    addChatMessage('coach', content);
+                }
+            } catch (e) {
+                addChatMessage('coach', '抱歉，出现了一些问题，请重试。');
+            }
+        }
+
+        async function skipToExplain() {
+            await explainPhase('我想直接学习');
+        }
+
+        async function explainPhase(understanding) {
+            conversationState = 'explaining';
+
+            try {
+                const concept = getConceptByTerm(currentTopic);
+                const moduleId = getModuleByTag(currentTopic.toLowerCase());
+                
+                let content = '';
+                
+                if (concept) {
+                    content += `<div class="concept-card">
+                        <div class="concept-term">${escapeHtml(concept.term)}</div>
+                        <div class="concept-definition">${escapeHtml(concept.definition)}</div>
+                        <div class="concept-points">
+                            ${concept.key_points.map(p => `<span class="concept-point">${escapeHtml(p)}</span>`).join('')}
+                        </div>
+                        ${concept.memory_tip ? `<div class="concept-tip">💡 ${escapeHtml(concept.memory_tip)}</div>` : ''}
+                    </div>`;
+                }
+
+                if (moduleId) {
+                    const module = getModuleKnowledge(moduleId);
+                    if (module) {
+                        const confusions = (module.confusions || []).slice(0, 2);
+                        const clinicalLinks = (module.clinical_links || []).slice(0, 2);
+                        
+                        if (confusions.length > 0) {
+                            content += `<p style="margin-top:12px;"><strong>⚠️ 常见混淆点：</strong></p>`;
+                            confusions.forEach(c => {
+                                content += `<div style="margin:8px 0;padding:10px;background:#fef3c7;border-radius:8px;font-size:0.85rem;">
+                                    <strong>${c.pair.join(' vs ')}</strong>：${escapeHtml(c.difference)}
+                                </div>`;
+                            });
+                        }
+
+                        if (clinicalLinks.length > 0) {
+                            content += `<p style="margin-top:12px;"><strong>🏥 临床关联：</strong></p>`;
+                            clinicalLinks.forEach(link => {
+                                content += `<div style="margin:6px 0;padding:8px 12px;background:#ecfdf5;border-radius:6px;font-size:0.85rem;">${escapeHtml(link)}</div>`;
+                            });
+                        }
+                    }
+                }
+
+                content += `<p style="margin-top:16px;color:var(--primary);"><strong>📝 理解检验：</strong></p>`;
+                content += `<p>你能用自己的话解释「${currentTopic}」吗？</p>`;
+                content += `<div style="margin-top:12px;">
+                    <button class="btn btn-primary" onclick="startTopicQuiz()" style="font-size:0.85rem;padding:6px 12px;">做几道题巩固一下</button>
+                </div>`;
+
+                addChatMessage('coach', content);
+            } catch (e) {
+                addChatMessage('coach', '抱歉，出现了一些问题，请重试。');
+            }
+        }
+
+        async function checkUnderstanding(response) {
+            let content = `<p>很好！你对「${currentTopic}」的理解正在建立。</p>`;
+            content += `<p style="margin-top:10px;">要不要继续探索其他主题，或者做几道题巩固一下？</p>`;
+            content += `<div class="quick-topics" style="margin-top:12px;">
+                <span class="topic-chip" onclick="startTopicQuiz()">做题巩固</span>
+                <span class="topic-chip" onclick="exploreTopic('补体系统')">学习补体</span>
+                <span class="topic-chip" onclick="exploreTopic('T细胞')">学习T细胞</span>
+            </div>`;
+            
+            addChatMessage('coach', content);
+            conversationState = 'idle';
+        }
+
+        async function startTopicQuiz() {
+            if (!currentTopic) return;
+            
+            try {
+                const topicLower = currentTopic.toLowerCase();
+                const matchingCards = DECK_DATA.cards.filter(card => {
+                    const cardTags = (card.tags || []).map(t => t.toLowerCase());
+                    return cardTags.some(t => t.includes(topicLower) || topicLower.includes(t));
+                });
+                
+                if (matchingCards.length > 0) {
+                    const n = Math.min(3, matchingCards.length);
+                    const selected = [];
+                    const indices = new Set();
+                    while (selected.length < n && indices.size < matchingCards.length) {
+                        const idx = Math.floor(Math.random() * matchingCards.length);
+                        if (!indices.has(idx)) {
+                            indices.add(idx);
+                            const card = matchingCards[idx];
+                            const c = {
+                                id: card.id,
+                                type: card.type,
+                                tags: card.tags || []
+                            };
+                            if (card.type === 'mcq') {
+                                c.stem = card.stem;
+                                c.choices = card.choices;
+                            } else {
+                                c.prompt = card.prompt;
+                            }
+                            selected.push(c);
+                        }
+                    }
+                    
+                    addChatMessage('coach', `<p>好的，我为你准备了 ${selected.length} 道关于「${currentTopic}」的题目。</p><p style="margin-top:8px;">正在跳转到练习界面...</p>`);
+                    
+                    setTimeout(() => {
+                        currentCards = selected;
+                        currentIndex = 0;
+                        results = [];
+                        
+                        document.querySelector('[data-tab="quiz"]').click();
+                        document.getElementById('quiz-setup').style.display = 'none';
+                        document.getElementById('quiz-area').style.display = 'block';
+                        showQuestion();
+                    }, 1000);
+                } else {
+                    addChatMessage('coach', '没有找到相关的练习题，试试其他主题吧！');
+                }
+            } catch (e) {
+                addChatMessage('coach', '加载题目失败，请重试。');
+            }
+        }
+
+        // ==================== 知识卡片 ====================
+        async function loadModules() {
+            try {
+                const data = await API.getModules();
+
+                if (data.success) {
+                    const grid = document.getElementById('module-grid');
+                    grid.innerHTML = data.modules.map((m, i) => `
+                        <div class="module-card" onclick="showModuleDetail('${m.id}')">
+                            <div class="module-number">${String(i + 1).padStart(2, '0')}</div>
+                            <div class="module-title">${escapeHtml(m.title)}</div>
+                            <div class="module-objectives">${m.objectives[0]}</div>
+                        </div>
+                    `).join('');
+                    
+                    const select = document.getElementById('quiz-module');
+                    if (select.options.length <= 1) {
+                        data.modules.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id;
+                            opt.textContent = m.title;
+                            select.appendChild(opt);
+                        });
+                    }
+
+                    const filterSelect = document.getElementById('knowledge-module-filter');
+                    if (filterSelect.options.length <= 1) {
+                        data.modules.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id;
+                            opt.textContent = m.title;
+                            filterSelect.appendChild(opt);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load modules:', e);
+            }
+        }
+
+        async function showModuleDetail(moduleId) {
+            try {
+                const data = await API.getModule(moduleId);
+
+                if (data.success) {
+                    const m = data.module;
+                    let html = `<h2 style="margin-bottom:15px;">${escapeHtml(m.title)}</h2>`;
+                    
+                    html += `<div style="margin-bottom:20px;">
+                        <h3>🎯 学习目标</h3>
+                        <ul style="padding-left:20px;margin-top:8px;">
+                            ${m.objectives.map(o => `<li style="margin-bottom:5px;">${escapeHtml(o)}</li>`).join('')}
+                        </ul>
+                    </div>`;
+
+                    html += `<div style="margin-bottom:20px;">
+                        <h3>📖 核心概念</h3>
+                        ${m.key_concepts.map(c => `
+                            <div class="concept-card">
+                                <div class="concept-term">${escapeHtml(c.term)}</div>
+                                <div class="concept-definition">${escapeHtml(c.definition)}</div>
+                                <div class="concept-points">
+                                    ${c.key_points.map(p => `<span class="concept-point">${escapeHtml(p)}</span>`).join('')}
+                                </div>
+                                ${c.memory_tip ? `<div class="concept-tip">💡 ${escapeHtml(c.memory_tip)}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>`;
+
+                    if (m.confusions && m.confusions.length > 0) {
+                        html += `<div style="margin-bottom:20px;">
+                            <h3>⚠️ 常见混淆点</h3>
+                            ${m.confusions.map(c => `
+                                <div style="margin:10px 0;padding:12px;background:#fef3c7;border-radius:8px;">
+                                    <div style="font-weight:600;margin-bottom:5px;">${c.pair.join(' vs ')}</div>
+                                    <div style="font-size:0.9rem;">${escapeHtml(c.difference)}</div>
+                                    <div style="margin-top:5px;font-size:0.85rem;color:var(--warning);">🎯 ${escapeHtml(c.exam_trap)}</div>
+                                </div>
+                            `).join('')}
+                        </div>`;
+                    }
+
+                    if (m.clinical_links && m.clinical_links.length > 0) {
+                        html += `<div style="margin-bottom:20px;">
+                            <h3>🏥 临床关联</h3>
+                            ${m.clinical_links.map(l => `<div style="margin:8px 0;padding:10px;background:#ecfdf5;border-radius:6px;font-size:0.9rem;">${escapeHtml(l)}</div>`).join('')}
+                        </div>`;
+                    }
+
+                    html += `<div style="margin-top:20px;">
+                        <button class="btn btn-primary" onclick="startModuleQuiz('${moduleId}')">📝 做这个模块的题</button>
+                    </div>`;
+
+                    document.getElementById('module-content').innerHTML = html;
+                    document.getElementById('module-list').style.display = 'none';
+                    document.getElementById('module-detail').style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Failed to load module detail:', e);
+            }
+        }
+
+        function showModuleList() {
+            document.getElementById('module-detail').style.display = 'none';
+            document.getElementById('module-list').style.display = 'block';
+        }
+
+        async function startModuleQuiz(moduleId) {
+            document.querySelector('[data-tab="quiz"]').click();
+            document.getElementById('quiz-module').value = moduleId;
+            startQuiz();
+        }
+
+        async function searchKnowledge() {
+            const term = document.getElementById('knowledge-search').value.trim();
+            if (!term) {
+                alert('请输入搜索关键词');
+                return;
+            }
+
+            try {
+                const data = await API.searchKnowledge(term);
+
+                if (data.success) {
+                    document.getElementById('module-list').style.display = 'none';
+                    document.getElementById('module-detail').style.display = 'none';
+                    document.getElementById('all-concepts-list').style.display = 'none';
+
+                    if (data.found && data.concepts.length > 0) {
+                        const resultsDiv = document.getElementById('search-results');
+                        const titleDiv = document.getElementById('search-results-title');
+                        const contentDiv = document.getElementById('search-results-content');
+
+                        titleDiv.innerHTML = `找到 ${data.count} 个相关知识点（显示前 ${data.concepts.length} 个）`;
+                        
+                        contentDiv.innerHTML = `
+                            <div class="concepts-grid">
+                                ${data.concepts.map(c => `
+                                    <div class="concept-card-clickable" onclick="showConceptDetail('${c.module_id}', '${escapeHtml(c.term)}')">
+                                        <div class="concept-module-badge">${escapeHtml(c.module)}</div>
+                                        <div class="concept-term">${escapeHtml(c.term)}</div>
+                                        <div class="concept-definition" style="font-size:0.85rem;color:var(--text-light);margin-top:6px;">
+                                            ${escapeHtml(c.definition.substring(0, 80))}${c.definition.length > 80 ? '...' : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+
+                        resultsDiv.style.display = 'block';
+                    } else {
+                        document.getElementById('search-results-content').innerHTML = `
+                            <div style="text-align:center;padding:40px;">
+                                <div style="font-size:3rem;margin-bottom:10px;">🔍</div>
+                                <div style="font-weight:600;margin-bottom:5px;">未找到相关知识点</div>
+                                <p style="color:var(--text-light);">试试其他关键词</p>
+                            </div>
+                        `;
+                        document.getElementById('search-results').style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.error('Search failed:', e);
+                alert('搜索失败，请重试');
+            }
+        }
+
+        async function showAllConcepts() {
+            const moduleId = document.getElementById('knowledge-module-filter').value;
+
+            try {
+                const data = await API.getConcepts(moduleId);
+
+                if (data.success) {
+                    document.getElementById('module-list').style.display = 'none';
+                    document.getElementById('module-detail').style.display = 'none';
+                    document.getElementById('search-results').style.display = 'none';
+
+                    const listDiv = document.getElementById('all-concepts-list');
+                    const titleDiv = document.getElementById('all-concepts-title');
+                    const contentDiv = document.getElementById('all-concepts-content');
+
+                    const moduleName = moduleId 
+                        ? document.getElementById('knowledge-module-filter').selectedOptions[0].text
+                        : '全部模块';
+
+                    titleDiv.innerHTML = `${moduleName} - 共 ${data.count} 个知识点`;
+
+                    contentDiv.innerHTML = `
+                        <div class="concepts-grid">
+                            ${data.concepts.map(c => `
+                                <div class="concept-card-clickable" onclick="showConceptDetail('${c.module_id}', '${escapeHtml(c.term)}')">
+                                    <div class="concept-module-badge">${escapeHtml(c.module)}</div>
+                                    <div class="concept-term">${escapeHtml(c.term)}</div>
+                                    <div class="concept-definition" style="font-size:0.85rem;color:var(--text-light);margin-top:6px;">
+                                        ${escapeHtml(c.definition.substring(0, 80))}${c.definition.length > 80 ? '...' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+
+                    listDiv.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Failed to load concepts:', e);
+                alert('加载失败，请重试');
+            }
+        }
+
+        function filterKnowledgeCards() {
+            const moduleId = document.getElementById('knowledge-module-filter').value;
+            if (moduleId) {
+                showAllConcepts();
+            }
+        }
+
+        async function showConceptDetail(moduleId, term) {
+            try {
+                const data = await API.getModule(moduleId);
+
+                if (data.success) {
+                    const concept = data.module.key_concepts.find(c => c.term === term);
+                    if (concept) {
+                        const modal = document.getElementById('concept-detail-modal');
+                        const content = document.getElementById('concept-detail-content');
+
+                        content.innerHTML = `
+                            <h2 style="margin-bottom:15px;color:var(--primary);">${escapeHtml(concept.term)}</h2>
+                            <div class="concept-module-badge" style="margin-bottom:12px;">${escapeHtml(data.module.title)}</div>
+                            
+                            <div class="concept-card">
+                                <div class="concept-definition" style="font-size:1rem;margin-bottom:12px;">
+                                    ${escapeHtml(concept.definition)}
+                                </div>
+                                <div class="concept-points">
+                                    ${concept.key_points.map(p => `<span class="concept-point">${escapeHtml(p)}</span>`).join('')}
+                                </div>
+                                ${concept.memory_tip ? `<div class="concept-tip" style="margin-top:10px;">💡 ${escapeHtml(concept.memory_tip)}</div>` : ''}
+                            </div>
+
+                            <div style="margin-top:20px;">
+                                <button class="btn btn-primary" onclick="startModuleQuiz('${moduleId}')">📝 做这个模块的题</button>
+                                <button class="btn btn-secondary" onclick="closeConceptDetail()" style="margin-left:10px;">关闭</button>
+                            </div>
+                        `;
+
+                        modal.style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load concept detail:', e);
+                alert('加载失败，请重试');
+            }
+        }
+
+        function closeConceptDetail() {
+            document.getElementById('concept-detail-modal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('concept-detail-modal');
+            if (event.target === modal) {
+                closeConceptDetail();
+            }
+        }
+
+        // ==================== 练习 ====================
+        async function startQuiz() {
+            const n = parseInt(document.getElementById('quiz-count').value) || 5;
+            const moduleId = document.getElementById('quiz-module').value;
+            const tags = moduleId ? [moduleId] : null;
+
+            try {
+                const data = await API.startQuiz(deckPath, n, tags);
+
+                if (!data.success) {
+                    alert(data.error || '加载失败');
+                    return;
+                }
+
+                if (data.cards.length === 0) {
+                    document.getElementById('quiz-area').innerHTML = `
+                        <div style="text-align:center;padding:40px;">
+                            <div style="font-size:3rem;margin-bottom:10px;">📭</div>
+                            <div style="font-weight:600;margin-bottom:5px;">暂无题目</div>
+                            <p style="color:var(--text-light);">该模块暂无练习题</p>
+                        </div>
+                    `;
+                    document.getElementById('quiz-area').style.display = 'block';
+                    document.getElementById('quiz-setup').style.display = 'none';
+                    return;
+                }
+
+                currentCards = data.cards;
+                currentIndex = 0;
+                results = [];
+
+                document.getElementById('quiz-setup').style.display = 'none';
+                document.getElementById('quiz-area').style.display = 'block';
+                showQuestion();
+            } catch (e) {
+                console.error('Error starting quiz:', e);
+                alert('请求失败');
+            }
+        }
+
+        function showQuestion() {
+            const card = currentCards[currentIndex];
+            const area = document.getElementById('quiz-area');
+            startTime = Date.now();
+
+            if (card.type === 'mcq') {
+                area.innerHTML = `
+                    <div class="quiz-card">
+                        <div class="quiz-stem">${currentIndex + 1}. ${escapeHtml(card.stem)}</div>
+                        <div class="quiz-choices">
+                            ${card.choices.map((choice, idx) => `
+                                <button class="choice-btn" onclick="submitMCQ('${String.fromCharCode(65 + idx)}')">
+                                    ${String.fromCharCode(65 + idx)}. ${escapeHtml(choice)}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                area.innerHTML = `
+                    <div class="quiz-card">
+                        <div class="quiz-stem">${currentIndex + 1}. ${escapeHtml(card.prompt)}</div>
+                        <div style="margin-top:15px;">
+                            <textarea id="short-answer" placeholder="输入你的答案..." style="width:100%;padding:12px;border:2px solid var(--border);border-radius:8px;font-size:0.9rem;min-height:100px;resize:vertical;"></textarea>
+                        </div>
+                        <div style="margin-top:15px;">
+                            <button class="btn btn-primary btn-block" onclick="submitShort()">提交答案</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function submitMCQ(answer) {
+            const card = currentCards[currentIndex];
+            const elapsedMs = Date.now() - startTime;
+            
+            try {
+                const data = await API.submitAnswer(deckPath, card.id, answer, elapsedMs);
+                
+                if (data.success) {
+                    results.push({ card, answer, correct: data.correct, elapsedMs });
+                    showResult(data);
+                }
+            } catch (e) {
+                console.error('Submit error:', e);
+                alert('提交失败');
+            }
+        }
+
+        async function submitShort() {
+            const card = currentCards[currentIndex];
+            const answer = document.getElementById('short-answer').value.trim();
+            if (!answer) {
+                alert('请输入答案');
+                return;
+            }
+            
+            const elapsedMs = Date.now() - startTime;
+            
+            try {
+                const data = await API.submitAnswer(deckPath, card.id, answer, elapsedMs);
+                
+                if (data.success) {
+                    results.push({ card, answer, correct: data.correct, elapsedMs });
+                    showResult(data);
+                }
+            } catch (e) {
+                console.error('Submit error:', e);
+                alert('提交失败');
+            }
+        }
+
+        function showResult(data) {
+            const card = currentCards[currentIndex];
+            const area = document.getElementById('quiz-area');
+            
+            let html = '';
+            
+            if (card.type === 'mcq') {
+                html = `
+                    <div class="quiz-card">
+                        <div class="quiz-stem">${currentIndex + 1}. ${escapeHtml(card.stem)}</div>
+                        <div class="quiz-choices">
+                            ${card.choices.map((choice, idx) => {
+                                let cls = '';
+                                if (idx === card.answer_index) cls = 'correct';
+                                else if (String.fromCharCode(65 + idx) === data.correct_answer && !data.correct) cls = 'wrong';
+                                
+                                return `
+                                    <button class="choice-btn ${cls}" disabled>
+                                        ${String.fromCharCode(65 + idx)}. ${escapeHtml(choice)}
+                                        ${idx === card.answer_index ? ' ✓' : ''}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div style="margin-top:15px;padding:12px;background:${data.correct ? '#d1fae5' : '#fee2e2'};border-radius:8px;">
+                            <div style="font-weight:600;margin-bottom:5px;">${data.correct ? '✅ 正确' : '❌ 错误'}</div>
+                            <div style="font-size:0.9rem;">${escapeHtml(data.explain)}</div>
+                        </div>
+                `;
+            } else {
+                html = `
+                    <div class="quiz-card">
+                        <div class="quiz-stem">${currentIndex + 1}. ${escapeHtml(card.prompt)}</div>
+                        <div style="margin-top:15px;padding:12px;background:${data.correct ? '#d1fae5' : '#fee2e2'};border-radius:8px;">
+                            <div style="font-weight:600;margin-bottom:5px;">${data.correct ? '✅ 正确' : '❌ 错误'}</div>
+                            <div style="margin-bottom:8px;"><strong>你的答案：</strong>${escapeHtml(data.response || '')}</div>
+                            <div style="margin-bottom:8px;"><strong>标准答案：</strong>${escapeHtml(data.correct_answer)}</div>
+                            <div style="font-size:0.9rem;">${escapeHtml(data.explain)}</div>
+                        </div>
+                `;
+            }
+            
+            if (data.learning_guide) {
+                html += `
+                    <div style="margin-top:15px;padding:12px;background:#fef3c7;border-radius:8px;">
+                        <div style="font-weight:600;margin-bottom:8px;">💡 学习建议</div>
+                        ${data.learning_guide.suggestions.map(s => `<div style="margin:5px 0;font-size:0.9rem;">${escapeHtml(s)}</div>`).join('')}
+                    </div>
+                `;
+            }
+            
+            html += `
+                        <div style="margin-top:15px;">
+                            ${currentIndex < currentCards.length - 1 
+                                ? `<button class="btn btn-primary btn-block" onclick="nextQuestion()">下一题</button>`
+                                : `<button class="btn btn-primary btn-block" onclick="showQuizSummary()">查看结果</button>`}
+                        </div>
+                    </div>
+            `;
+            
+            area.innerHTML = html;
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            showQuestion();
+        }
+
+        function showQuizSummary() {
+            const correct = results.filter(r => r.correct).length;
+            const total = results.length;
+            const accuracy = total > 0 ? (correct / total * 100).toFixed(0) : 0;
+            
+            document.getElementById('quiz-area').innerHTML = `
+                <div class="quiz-card">
+                    <h2 style="margin-bottom:15px;text-align:center;">练习完成</h2>
+                    <div style="text-align:center;padding:20px;background:var(--bg);border-radius:10px;margin-bottom:15px;">
+                        <div style="font-size:2rem;font-weight:700;color:var(--primary);margin-bottom:5px;">${correct}/${total}</div>
+                        <div style="color:var(--text-light);">正确率: ${accuracy}%</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="resetQuiz()">再做一次</button>
+                </div>
+            `;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-setup').style.display = 'block';
+            document.getElementById('quiz-area').style.display = 'none';
+            currentCards = [];
+            currentIndex = 0;
+            results = [];
+        }
+
+        // ==================== 学习进度 ====================
+        async function loadProgress() {
+            try {
+                const data = await API.getProgress(deckPath);
+                
+                if (data.success) {
+                    let html = `
+                        <h2 style="margin-bottom:15px;">学习进度</h2>
+                        <div style="margin-bottom:20px;padding:15px;background:var(--bg);border-radius:10px;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                                <span>总题数：</span>
+                                <strong>${data.total_cards}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                                <span>错题数：</span>
+                                <strong style="color:var(--danger);">${data.wrong_count}</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;">
+                                <span>近7天正确率：</span>
+                                <strong>${(data.stats.recent_accuracy * 100).toFixed(0)}%</strong>
+                            </div>
+                        </div>
+                        <h3 style="margin-bottom:15px;">模块进度</h3>
+                    `;
+                    
+                    for (const [moduleId, progress] of Object.entries(data.module_progress)) {
+                        html += `
+                            <div style="margin-bottom:15px;padding:15px;background:white;border-radius:10px;border:1px solid var(--border);">
+                                <div style="font-weight:600;margin-bottom:8px;">${escapeHtml(progress.title)}</div>
+                                <div style="font-size:0.85rem;color:var(--text-light);margin-bottom:8px;">
+                                    已练习: ${progress.practiced}/${progress.total} | 已掌握: ${progress.mastered}
+                                </div>
+                                <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;">
+                                    <div style="height:100%;background:var(--primary);width:${progress.progress}%;transition:width 0.3s;"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    document.getElementById('progress-content').innerHTML = html;
+                }
+            } catch (e) {
+                console.error('Failed to load progress:', e);
+                document.getElementById('progress-content').innerHTML = '<p>加载失败，请重试</p>';
+            }
+        }
+
+        // ==================== 错题本 ====================
+        async function loadWrongCards() {
+            try {
+                const data = await API.getWrongCards(deckPath);
+                
+                if (data.success) {
+                    if (data.wrong_cards.length === 0) {
+                        document.getElementById('wrong-content').innerHTML = `
+                            <div style="text-align:center;padding:40px;">
+                                <div style="font-size:3rem;margin-bottom:10px;">🎉</div>
+                                <div style="font-weight:600;margin-bottom:5px;">暂无错题</div>
+                                <p style="color:var(--text-light);">继续保持！</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    const wrongCards = data.wrong_cards.map(id => getCardById(id)).filter(c => c !== null);
+                    
+                    let html = `
+                        <h2 style="margin-bottom:15px;">错题本 (${wrongCards.length}题)</h2>
+                        <button class="btn btn-secondary" onclick="reviewWrongCards()" style="margin-bottom:15px;">📝 复习错题</button>
+                    `;
+                    
+                    wrongCards.forEach((card, idx) => {
+                        html += `
+                            <div class="quiz-card">
+                                <div class="quiz-stem">${idx + 1}. ${escapeHtml(card.type === 'mcq' ? card.stem : card.prompt)}</div>
+                                ${card.type === 'mcq' ? `
+                                    <div style="margin-top:10px;">
+                                        ${card.choices.map((c, i) => `
+                                            <div style="padding:8px;margin:5px 0;background:${i === card.answer_index ? '#d1fae5' : 'var(--bg)'};border-radius:6px;">
+                                                ${String.fromCharCode(65 + i)}. ${escapeHtml(c)}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                                <div style="margin-top:10px;padding:10px;background:var(--bg);border-radius:6px;font-size:0.9rem;">
+                                    <strong>解析：</strong>${escapeHtml(card.explain || '')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    document.getElementById('wrong-content').innerHTML = html;
+                }
+            } catch (e) {
+                console.error('Failed to load wrong cards:', e);
+                document.getElementById('wrong-content').innerHTML = '<p>加载失败，请重试</p>';
+            }
+        }
+
+        async function reviewWrongCards() {
+            try {
+                const data = await API.getReviewCards(deckPath, 10, true);
+                
+                if (data.success && data.cards.length > 0) {
+                    currentCards = data.cards;
+                    currentIndex = 0;
+                    results = [];
+                    
+                    document.querySelector('[data-tab="quiz"]').click();
+                    document.getElementById('quiz-setup').style.display = 'none';
+                    document.getElementById('quiz-area').style.display = 'block';
+                    showQuestion();
+                } else {
+                    alert('没有到期复习的错题');
+                }
+            } catch (e) {
+                console.error('Review error:', e);
+                alert('加载失败');
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModules();
+        });
+    </script>
+</body>
+</html>

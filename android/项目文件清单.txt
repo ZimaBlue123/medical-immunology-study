@@ -1,0 +1,100 @@
+医学免疫学学习系统 - Android应用项目文件清单
+==========================================
+
+所有Android应用文件都在此文件夹（android/）中：
+
+【核心源代码】
+✓ app/src/main/java/com/medical/immunology/study/MainActivity.kt
+  - 主Activity，WebView容器
+
+✓ app/src/main/AndroidManifest.xml
+  - 应用清单文件，配置权限和Activity
+
+【资源文件】
+✓ app/src/main/res/layout/activity_main.xml
+  - 主布局文件
+
+✓ app/src/main/res/values/strings.xml
+  - 字符串资源
+
+✓ app/src/main/res/values/styles.xml
+  - 样式资源
+
+【前端文件（assets）】
+✓ app/src/main/assets/index.html
+  - 主HTML文件（已适配Android）
+
+✓ app/src/main/assets/js/knowledge-base.js
+  - 知识库数据（150+概念）
+
+✓ app/src/main/assets/js/deck-data.js
+  - 题库数据
+
+✓ app/src/main/assets/js/api.js
+  - 前端API层（替代Flask后端）
+
+【构建配置】
+✓ app/build.gradle
+  - 应用级构建配置
+
+✓ build.gradle
+  - 项目级构建配置
+
+✓ settings.gradle
+  - 项目设置
+
+✓ gradle.properties
+  - Gradle属性
+
+✓ gradle/wrapper/gradle-wrapper.properties
+  - Gradle Wrapper配置
+
+✓ app/proguard-rules.pro
+  - ProGuard规则
+
+【构建脚本】
+✓ build-apk.bat
+  - Windows构建脚本
+
+✓ 一键构建APK.bat
+  - 增强版一键构建脚本（自动检测SDK）
+
+【文档】
+✓ README.md
+  - 项目说明
+
+✓ BUILD_GUIDE.md
+  - 详细构建指南
+
+✓ APK_LOCATION.md
+  - APK文件位置说明
+
+✓ local.properties.example
+  - SDK配置示例
+
+==========================================
+APK文件位置（构建后）：
+==========================================
+
+Debug版本：
+android/app/build/outputs/apk/debug/app-debug.apk
+
+Release版本（需要签名）：
+android/app/build/outputs/apk/release/app-release.apk
+
+==========================================
+快速构建：
+==========================================
+
+方法1：双击运行
+  一键构建APK.bat
+
+方法2：命令行
+  cd android
+  gradlew.bat assembleDebug
+
+方法3：Android Studio
+  File -> Open -> 选择android目录
+  Build -> Build APK(s)
+
+==========================================
