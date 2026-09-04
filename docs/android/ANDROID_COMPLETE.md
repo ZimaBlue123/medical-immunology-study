@@ -27,7 +27,7 @@
 - ✅ `app/src/main/assets/js/api.js` - 前端API层（替代Flask后端）
 
 **转换脚本：**
-- ✅ `convert_to_android.py` - Python到JavaScript转换工具
+- ✅ `scripts/convert_to_android.py` - Python到JavaScript转换工具
 
 ### 3. 前端适配 ✅
 
@@ -207,7 +207,7 @@ sdk.dir=C\:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk
 # 编辑 immuno_study/knowledge.py 或 decks/people9-core.json
 
 # 2. 重新生成JavaScript文件
-python convert_to_android.py
+python scripts/convert_to_android.py
 
 # 3. 重新构建APK
 cd android

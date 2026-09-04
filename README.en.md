@@ -13,14 +13,14 @@ An offline learning system for medical immunology (aligned with People's Medical
 - Supports both browsing mode (knowledge cards/modules) and task mode (quiz/review/stats).
 
 ### 2) Technical Architecture
-- **Backend**: `app.py` (Flask) exposing REST APIs for quiz, review, knowledge, coaching, and progress.
-- **Core engine**: `immuno_study/deck.py`, `immuno_study/engine.py`, `immuno_study/store.py`.
+- **Backend**: `scripts/app.py` (Flask) exposing REST APIs for quiz, review, knowledge, coaching, and progress.
+- **Core engine**: `scripts/immuno_study/deck.py`, `scripts/immuno_study/engine.py`, `scripts/immuno_study/store.py`.
 - **Data layer**: local JSON/JSONL files, database-free, easy backup, offline-first.
 - **Frontend**: native HTML/CSS/JS in `templates/` and static assets.
 - **Android extension**: additional Android delivery artifacts under `android/`.
 
 ### 3) Learning Model
-- **Knowledge model**: `immuno_study/knowledge.py` with 12 immunology modules.
+- **Knowledge model**: `scripts/immuno_study/knowledge.py` with 12 immunology modules.
 - **Practice model**: `decks/people9-core.json` includes MCQ + short-answer cards with explanations and tags.
 - **Memory model**: lightweight SRS with interval/ease/due date.
 - **Coaching model**: Socratic flow (probe understanding -> focused explanation -> check questions).
@@ -37,7 +37,7 @@ python -m venv .venv
 pip install -r requirements.txt
 
 # Web mode
-python app.py
+python scripts/app.py
 # Open http://127.0.0.1:5000
 ```
 
@@ -50,21 +50,24 @@ npm test           # Runs frontend and SRS engine unit tests
 
 ```powershell
 # CLI mode
-python -m immuno_study --help
-python -m immuno_study quiz --deck .\decks\people9-core.json --n 10
-python -m immuno_study review --deck .\decks\people9-core.json --n 10
-python -m immuno_study stats
+python scripts/run_cli.py --help
+python scripts/run_cli.py quiz --deck .\decks\people9-core.json --n 10
+python scripts/run_cli.py review --deck .\decks\people9-core.json --n 10
+python scripts/run_cli.py stats
 ```
 
 ## Project Layout
 
 ```text
 medical-immunology-study/
-├─ app.py
+├─ scripts/                  # All Python code centralized here
+│  ├─ app.py                 # Web application server
+│  ├─ convert_to_android.py  # Android assets synchronization
+│  ├─ run_cli.py             # CLI runner
+│  └─ immuno_study/          # Core Python package
 ├─ package.json
 ├─ webpack.config.js
 ├─ index.js
-├─ immuno_study/
 ├─ decks/
 ├─ docs/
 ├─ sessions/

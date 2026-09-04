@@ -136,7 +136,7 @@ build-apk.bat
 
 2. **重新生成JavaScript文件**
    ```bash
-   python convert_to_android.py
+   python scripts/convert_to_android.py
    ```
 
 3. **重新构建APK**

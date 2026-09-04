@@ -214,7 +214,7 @@ android/
 1. **首次构建**：可能需要下载Gradle和依赖，需要网络连接
 2. **Gradle版本**：使用Gradle 8.2，如不兼容可调整
 3. **SDK版本**：最低API 24 (Android 7.0)，目标API 34
-4. **数据更新**：如需更新知识库，运行 `convert_to_android.py` 后重新构建
+4. **数据更新**：如需更新知识库，运行 `python scripts/convert_to_android.py` 后重新构建
 
 ## 🎉 完成！
 

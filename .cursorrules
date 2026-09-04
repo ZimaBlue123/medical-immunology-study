@@ -1,0 +1,11 @@
+# Cursor Rules for Medical Immunology Study
+
+## Python Code Organization Rule (Strict)
+- **Centralized in `scripts/`**: All Python (`.py`) code must be placed strictly inside the `scripts/` directory.
+- **No loose `.py` files**: Do NOT create or scatter any `.py` files in the root directory or any other folders outside `scripts/`.
+- **Future `.py` files**: Any new scripts, utilities, tools, or modules written in Python MUST be created inside `scripts/` (or its subdirectories).
+- **Execution**:
+  - Web Server: `python scripts/app.py`
+  - CLI Tool: `python scripts/run_cli.py [args]`
+  - Android Data Sync: `python scripts/convert_to_android.py`
+  - Tests: `pytest`

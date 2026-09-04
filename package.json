@@ -7,7 +7,7 @@
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "test": "node --test tests/test_bundle.test.js",
-    "convert:android": "python convert_to_android.py"
+    "convert:android": "python scripts/convert_to_android.py"
   },
   "keywords": [
     "medical",

@@ -17,7 +17,7 @@
 
 ```powershell
 # 启动Web应用
-python app.py
+python scripts/app.py
 
 # 浏览器访问
 http://127.0.0.1:5000
@@ -27,10 +27,10 @@ http://127.0.0.1:5000
 
 ```powershell
 # 随机练习10题
-python -m immuno_study quiz --deck decks/people9-core.json --n 10
+python scripts/run_cli.py quiz --deck decks/people9-core.json --n 10
 
 # 复习到期题目
-python -m immuno_study review --deck decks/people9-core.json --n 10
+python scripts/run_cli.py review --deck decks/people9-core.json --n 10
 
 # 查看统计
 python -m immuno_study stats
@@ -299,13 +299,16 @@ python -m immuno_study stats
 
 ```
 medical-immunology-study/
-├── app.py                    # Web应用主文件
-├── immuno_study/
-│   ├── knowledge.py          # 知识库（150+概念）
-│   ├── deck.py               # 题库管理
-│   ├── engine.py             # 出题/判题引擎
-│   ├── store.py              # 学习记录存储
-│   └── cli.py                # 命令行工具
+├── scripts/                  # 所有 Python 源码统一归口
+│   ├── app.py                # Web应用主文件
+│   ├── convert_to_android.py # Android数据转换工具
+│   ├── run_cli.py            # CLI启动工具
+│   └── immuno_study/         # 核心业务模块
+│       ├── knowledge.py      # 知识库（150+概念）
+│       ├── deck.py           # 题库管理
+│       ├── engine.py         # 出题/判题引擎
+│       ├── store.py          # 学习记录存储
+│       └── cli.py            # 命令行工具
 ├── templates/
 │   └── index.html            # 前端界面
 ├── decks/

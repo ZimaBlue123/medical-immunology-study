@@ -6,9 +6,11 @@
 
 欢迎提交：
 - 题库扩展（`decks/*.json`）
-- 知识库优化（`immuno_study/knowledge.py`）
+- 知识库优化（`scripts/immuno_study/knowledge.py`）
 - 文档改进（`README.md`、`README.en.md`、`docs/*.md`）
-- 功能增强与缺陷修复（`immuno_study/*.py`、`app.py`）
+- 功能增强与缺陷修复（`scripts/immuno_study/*.py`、`scripts/app.py`、`scripts/*.py`）
+
+> **重要代码规范**：所有 Python (`.py`) 源码与脚本工具必须统一约束在 `scripts/` 目录中，任何新建的 `.py` 文件也一律归入 `scripts/`，严禁在项目根目录或其他目录散落 Python 源码。
 
 暂不建议：
 - 提交教材原文或大段近似改写内容

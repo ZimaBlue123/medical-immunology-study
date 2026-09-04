@@ -4,7 +4,15 @@
 """
 import json
 import os
+import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(1, str(PROJECT_ROOT))
 
 # 导入知识库和题库
 from immuno_study.knowledge import KNOWLEDGE_BASE, MODULE_TAGS
@@ -81,7 +89,7 @@ function getModuleByTag(tag) {
 
 def convert_deck():
     """转换题库为JavaScript"""
-    deck = load_deck("decks/people9-core.json")
+    deck = load_deck(PROJECT_ROOT / "decks" / "people9-core.json")
     
     js_content = "// 医学免疫学题库\n"
     js_content += "// 自动生成，请勿手动修改\n\n"
@@ -117,7 +125,7 @@ function filterCardsByTags(cards, tags) {
 def main():
     """主函数"""
     # 创建输出目录
-    output_dir = Path("android/app/src/main/assets/js")
+    output_dir = PROJECT_ROOT / "android" / "app" / "src" / "main" / "assets" / "js"
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # 转换知识库

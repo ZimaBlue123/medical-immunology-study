@@ -7,7 +7,17 @@ Flask 后端，提供 API 接口
 from __future__ import annotations
 
 import random
+import sys
 from pathlib import Path
+
+# Ensure project root and scripts directory are available in sys.path
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(1, str(PROJECT_ROOT))
+
 from flask import Flask, jsonify, request, render_template
 
 from immuno_study.deck import load_deck, filter_cards, DeckError
@@ -34,14 +44,22 @@ from immuno_study.knowledge import (
     get_module_by_tag,
 )
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(
+    __name__,
+    static_folder=str(PROJECT_ROOT / "static"),
+    template_folder=str(PROJECT_ROOT / "templates")
+)
 
 # 默认题库路径
-DEFAULT_DECK = "decks/people9-core.json"
+DEFAULT_DECK = str(PROJECT_ROOT / "decks" / "people9-core.json")
 
 
 def get_deck_path() -> str:
-    return request.args.get("deck", DEFAULT_DECK)
+    path_str = request.args.get("deck", DEFAULT_DECK)
+    p = Path(path_str)
+    if not p.is_absolute():
+        p = PROJECT_ROOT / p
+    return str(p)
 
 
 @app.route("/")

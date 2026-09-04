@@ -12,8 +12,11 @@ def _utcnow() -> datetime:
 
 
 def project_root() -> Path:
-    # .../medical-immunology-study/immuno_study/store.py -> project root is parents[1]
-    return Path(__file__).resolve().parents[1]
+    current = Path(__file__).resolve()
+    for parent in current.parents:
+        if (parent / ".git").exists() or (parent / "package.json").exists() or (parent / "decks").exists():
+            return parent
+    return current.parents[2]
 
 
 def data_dir() -> Path:

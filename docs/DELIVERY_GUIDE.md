@@ -103,7 +103,7 @@
 
 1. **启动应用**:
 ```bash
-python app.py
+python scripts/app.py
 ```
 
 2. **访问**: 浏览器打开 `http://localhost:5000`
@@ -184,11 +184,16 @@ medical-immunology-study/
 │           └── api.js               # API接口
 ├── decks/
 │   └── people9-core.json           # 练习题库（25题）
-├── immuno_study/                    # Python CLI
-│   ├── cli.py                      # 命令行接口
-│   ├── engine.py                   # 出题引擎
-│   └── store.py                    # 数据存储
-└── app.py                          # Web服务器
+└── scripts/                        # 所有 Python 源码统一归口
+    ├── app.py                      # Web服务器
+    ├── convert_to_android.py       # Android数据转换工具
+    ├── run_cli.py                  # CLI启动工具
+    └── immuno_study/               # 核心学习与题库模块
+        ├── cli.py                  # 命令行接口
+        ├── deck.py                 # 题库加载与校验
+        ├── engine.py               # 出题与判题引擎
+        ├── knowledge.py            # 知识库
+        └── store.py                # 数据存储
 ```
 
 ### 技术栈

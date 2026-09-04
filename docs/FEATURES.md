@@ -115,7 +115,7 @@
 start.bat
 
 # 或直接运行
-python app.py
+python scripts/app.py
 
 # 浏览器访问
 http://127.0.0.1:5000
@@ -125,10 +125,10 @@ http://127.0.0.1:5000
 
 ```bash
 # 随机练习
-python -m immuno_study quiz --deck decks/people9-core.json --n 10
+python scripts/run_cli.py quiz --deck decks/people9-core.json --n 10
 
 # 复习
-python -m immuno_study review --deck decks/people9-core.json --n 10
+python scripts/run_cli.py review --deck decks/people9-core.json --n 10
 
 # 统计
 python -m immuno_study stats

@@ -13,14 +13,14 @@
 - 既支持浏览式学习（知识卡片、模块导航），也支持任务式学习（刷题、复习、统计）。
 
 ### 2) 技术架构
-- **后端服务**：`app.py`（Flask），提供 REST API（题库、练习、知识库、学习教练、进度）。
-- **核心引擎**：`immuno_study/` 下的 `deck.py`（题库校验）、`engine.py`（判题）、`store.py`（SRS/错题/做题日志）。
+- **后端服务**：`scripts/app.py`（Flask），提供 REST API（题库、练习、知识库、学习教练、进度）。
+- **核心引擎**：`scripts/immuno_study/` 下的 `deck.py`（题库校验）、`engine.py`（判题）、`store.py`（SRS/错题/做题日志）。
 - **数据层**：本地 JSON/JSONL，无数据库依赖，易备份、可离线。
 - **前端层**：`templates/index.html` + `static`（原生 JS/CSS 交互）。
 - **多端扩展**：含 `android/` 目录与构建文档，支持 Android 交付链路。
 
 ### 3) 学习模型设计
-- **知识模型**：`immuno_study/knowledge.py` 维护 12 个模块（总论、固有免疫、补体、MHC、抗体、T/B 细胞、细胞因子、超敏、自免、免疫缺陷、肿瘤与移植等）。
+- **知识模型**：`scripts/immuno_study/knowledge.py` 维护 12 个模块（总论、固有免疫、补体、MHC、抗体、T/B 细胞、细胞因子、超敏、自免、免疫缺陷、肿瘤与移植等）。
 - **练习模型**：`decks/people9-core.json` 定义 MCQ + 简答题，含答案、解析、标签。
 - **记忆模型**：轻量 SRS（间隔、难度因子、到期日、连续答对）驱动复习。
 - **教练模型**：Socratic 流程（先探测理解，再聚焦讲解，再做核验）。
@@ -37,7 +37,7 @@ python -m venv .venv
 pip install -r requirements.txt
 
 # Web 模式
-python app.py
+python scripts/app.py
 # 浏览器打开 http://127.0.0.1:5000
 ```
 
@@ -50,26 +50,29 @@ npm test           # 执行前端核心模块与 SRS 算法测试
 
 ```powershell
 # CLI 模式
-python -m immuno_study --help
-python -m immuno_study quiz --deck .\decks\people9-core.json --n 10
-python -m immuno_study review --deck .\decks\people9-core.json --n 10
-python -m immuno_study stats
+python scripts/run_cli.py --help
+python scripts/run_cli.py quiz --deck .\decks\people9-core.json --n 10
+python scripts/run_cli.py review --deck .\decks\people9-core.json --n 10
+python scripts/run_cli.py stats
 ```
 
 ## 目录结构
 
 ```text
 medical-immunology-study/
-├─ app.py
+├─ scripts/                  # 所有 Python 代码统一约束在此
+│  ├─ app.py                 # Web 服务
+│  ├─ convert_to_android.py  # Android 资源同步
+│  ├─ run_cli.py             # CLI 启动入口
+│  └─ immuno_study/          # 核心业务包
+│     ├─ cli.py
+│     ├─ deck.py
+│     ├─ engine.py
+│     ├─ knowledge.py
+│     └─ store.py
 ├─ package.json
 ├─ webpack.config.js
 ├─ index.js
-├─ immuno_study/
-│  ├─ cli.py
-│  ├─ deck.py
-│  ├─ engine.py
-│  ├─ knowledge.py
-│  └─ store.py
 ├─ decks/
 │  └─ people9-core.json
 ├─ docs/

@@ -78,3 +78,15 @@ alwaysApply: true
 
 - 对“机制链条/关键分子/经典表述”要谨慎：如果不确定，明确标注“不确定，需要对照教材第X章/页码”
 - 出题解析要强调“为什么其他选项不对”
+
+---
+
+## 代码与脚本工程规范（强制执行）
+
+- **Python 代码统一归拢**：所有相关的 Python (`.py`) 代码必须集中约束在 `scripts/` 目录内（包括 Web 服务、CLI 运行器、Android 转换工具及 `immuno_study/` 核心包）。
+- **新建文件约束**：后续若有任何新建的 Python 文件，必须严格归类到 `scripts/` 文件夹及其子模块中，严禁在项目根目录或散落到其他非 `scripts/` 目录。
+- **常用启动命令**：
+  - Web 模式：`python scripts/app.py`
+  - CLI 模式：`python scripts/run_cli.py [quiz|review|stats|new-session]`
+  - Android 转换：`python scripts/convert_to_android.py`
+

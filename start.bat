@@ -12,6 +12,6 @@ echo 按 Ctrl+C 停止服务器
 echo ========================================
 echo.
 
-python app.py
+python scripts\app.py
 
 pause
