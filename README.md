@@ -42,6 +42,13 @@ python app.py
 ```
 
 ```powershell
+# 前端构建 / CI 检查 (Node.js & Webpack)
+npm install
+npm run build      # 生成生产构建 dist/bundle.js
+npm test           # 执行前端核心模块与 SRS 算法测试
+```
+
+```powershell
 # CLI 模式
 python -m immuno_study --help
 python -m immuno_study quiz --deck .\decks\people9-core.json --n 10
@@ -54,6 +61,9 @@ python -m immuno_study stats
 ```text
 medical-immunology-study/
 ├─ app.py
+├─ package.json
+├─ webpack.config.js
+├─ index.js
 ├─ immuno_study/
 │  ├─ cli.py
 │  ├─ deck.py

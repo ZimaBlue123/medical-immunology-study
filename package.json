@@ -1,17 +1,23 @@
 {
   "name": "medical-immunology-study",
   "version": "1.0.0",
-  "description": "Medical immunology study project",
+  "description": "Medical immunology study system with Web, CLI, Android, and SRS quiz engine",
   "main": "index.js",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "test": "node --test tests/test_bundle.test.js",
+    "convert:android": "python convert_to_android.py"
   },
   "keywords": [
     "medical",
     "immunology",
-    "study"
+    "study",
+    "srs",
+    "quiz",
+    "education"
   ],
-  "author": "",
+  "author": "ZimaBlue123",
   "license": "MIT",
   "devDependencies": {
     "webpack": "^5.90.0",

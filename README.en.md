@@ -42,6 +42,13 @@ python app.py
 ```
 
 ```powershell
+# Frontend Build & CI Checks (Node.js & Webpack)
+npm install
+npm run build      # Generates production bundle dist/bundle.js
+npm test           # Runs frontend and SRS engine unit tests
+```
+
+```powershell
 # CLI mode
 python -m immuno_study --help
 python -m immuno_study quiz --deck .\decks\people9-core.json --n 10
@@ -54,6 +61,9 @@ python -m immuno_study stats
 ```text
 medical-immunology-study/
 ├─ app.py
+├─ package.json
+├─ webpack.config.js
+├─ index.js
 ├─ immuno_study/
 ├─ decks/
 ├─ docs/
