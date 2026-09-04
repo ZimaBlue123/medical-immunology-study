@@ -37,6 +37,7 @@ config_local.yaml
 secrets/
 
 # Project runtime data
+scripts/immuno_study/data/
 immuno_study/data/
 data/
 raw_data/
@@ -55,4 +56,6 @@ android/.gradle/
 android/.idea/
 android/**/build/
 android/local.properties
+android/hs_err_*.log
+android/replay_*.log
 *.apk

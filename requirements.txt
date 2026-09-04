@@ -1,2 +1,7 @@
-# Core dependency for Web API and UI
-flask>=3.0,<4.0
+# Medical Immunology Study System - Python Dependencies
+
+# Core Web Application Framework
+flask>=3.0.0,<4.0.0
+
+# Testing Framework
+pytest>=7.0.0
