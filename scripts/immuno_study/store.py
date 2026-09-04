@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -28,7 +28,10 @@ def data_dir() -> Path:
 def _json_load(path: Path, default: Any) -> Any:
     if not path.exists():
         return default
-    return json.loads(path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return default
 
 
 def _json_save(path: Path, data: Any) -> None:
@@ -95,7 +98,7 @@ def get_wrong_cards(deck_path: str) -> set[str]:
 class SRSState:
     ease: float = 2.3
     interval_days: int = 0
-    due: date = date.today()
+    due: date = field(default_factory=date.today)
     last_review: date | None = None
     streak: int = 0
 

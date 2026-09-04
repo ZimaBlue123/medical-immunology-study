@@ -97,8 +97,13 @@ def validate_deck_dict(data: dict[str, Any]) -> Deck:
 
 def load_deck(path: str | Path) -> Deck:
     p = Path(path)
-    raw = p.read_text(encoding="utf-8")
-    data = json.loads(raw)
+    if not p.is_file():
+        raise DeckError(f"Deck file not found: {p}")
+    try:
+        raw = p.read_text(encoding="utf-8")
+        data = json.loads(raw)
+    except json.JSONDecodeError as err:
+        raise DeckError(f"Invalid JSON in deck file {p}: {err}") from err
     return validate_deck_dict(data)
 
 

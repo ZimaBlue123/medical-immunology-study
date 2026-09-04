@@ -54,12 +54,17 @@ app = Flask(
 DEFAULT_DECK = str(PROJECT_ROOT / "decks" / "people9-core.json")
 
 
-def get_deck_path() -> str:
-    path_str = request.args.get("deck", DEFAULT_DECK)
+def resolve_deck_path(path_str: str | None) -> str:
+    if not path_str:
+        return DEFAULT_DECK
     p = Path(path_str)
     if not p.is_absolute():
         p = PROJECT_ROOT / p
     return str(p)
+
+
+def get_deck_path() -> str:
+    return resolve_deck_path(request.args.get("deck"))
 
 
 @app.route("/")
@@ -99,7 +104,7 @@ def api_quiz_start():
     """开始随机练习，返回题目列表"""
     try:
         data = request.get_json() or {}
-        deck_path = data.get("deck", DEFAULT_DECK)
+        deck_path = resolve_deck_path(data.get("deck"))
         n = int(data.get("n", 10))
         tags = data.get("tags")
 
@@ -141,7 +146,7 @@ def api_quiz_submit():
     """提交单题答案，返回批改结果（含学习引导）"""
     try:
         data = request.get_json() or {}
-        deck_path = data.get("deck", DEFAULT_DECK)
+        deck_path = resolve_deck_path(data.get("deck"))
         card_id = data.get("card_id")
         answer = data.get("answer")
         elapsed_ms = data.get("elapsed_ms")
@@ -225,7 +230,7 @@ def api_review_cards():
     """获取到期复习题"""
     try:
         data = request.get_json() or {}
-        deck_path = data.get("deck", DEFAULT_DECK)
+        deck_path = resolve_deck_path(data.get("deck"))
         n = int(data.get("n", 10))
         only_wrong = data.get("only_wrong", False)
 
